@@ -7,6 +7,7 @@ use App\Models\Experience;
 use App\Models\Individuel;
 use App\Models\Skills;
 use App\Models\User;
+use App\Models\Image;
 use Illuminate\Http\Request;
 
 class IndividuelController extends Controller
@@ -81,9 +82,23 @@ class IndividuelController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $data = $request->input();
-        $id = \Auth::id() ;
-         Individuel::where("user_id", "=" ,$id)->update($data);
+        return $request;
+        $request->validate([
+            "phone"=>"numeric",
+            "image"=>"image",
+        ]);
+        if($id != \Auth::id()){
+        return \Response::json(["status"=>403 , "message"=>"user unautorized"]);
+        }
+        if($request->has("image")){
+            $image = $request->file("image")->store("individuel", "public");
+            $image = Image::create(["path"=>$image]);
+            return $image ;
+        }
+            $data = $request->input();
+            $id = \Auth::id() ;
+            Individuel::where("user_id", "=" ,$id)->update($data);
+
         return \Response::json(["status"=>200]);
     }
 
