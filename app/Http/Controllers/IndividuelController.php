@@ -1,0 +1,97 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Education;
+use App\Models\Experience;
+use App\Models\Individuel;
+use App\Models\Skills;
+use App\Models\User;
+use Illuminate\Http\Request;
+
+class IndividuelController extends Controller
+{
+    /**
+     * Display a listing of the resource.
+     */
+    public function index(Request $request)
+    {
+           
+   
+        $individuel = Individuel::orderBy("created_at");
+        if($request->has("q")){
+            $q="%".$request->input("q")."%";
+            $individuel = $individuel->where(function ($query ) use ($q){
+                $query->where("nom", "like" , $q)->orWhere("description" , "like",$q)->orWhere("prenom" , "like",$q);
+            });
+        };
+        if($request->has("city")){
+            $city = $request->input("city");
+            $individuel = $individuel->where("location", "=",$city);
+        };
+        return \Response::json($individuel->limit(30)->get());
+    }
+   
+
+    /**
+     * Show the form for creating a new resource.
+     */
+    public function create()
+    {
+        //
+    }
+
+    /**
+     * Store a newly created resource in storage.
+     */
+    public function store(Request $request)
+    {
+        //
+    }
+
+    /**
+     * Display the specified resource.
+     */
+    public function show(string $id)
+    {
+        $individuel = Individuel::where("user_id","=", $id )->get();
+        $experience = Experience::where("user_id","=", $id )->get();
+        $skill = Skills::where("user_id","=", $id )->get();
+        $education = Education::where("user","=", $id )->get();
+        $email = User::find($id)->email ;
+        return \Response::json(["ind"=>$individuel , "experience"=>$experience , "skill" =>$skill , "education"=>$education ,"email"=> $email]);
+    }
+
+    /**
+     * Show the form for editing the specified resource.
+     */
+    public function edit(Request $request)
+    {
+        $id = $request->user()->id;
+        $individuel = Individuel::where("user_id","=", $id )->get();
+        $experience = Experience::where("user_id","=", $id )->get();
+        $skill = Skills::where("user_id","=", $id )->get();
+        $education = Education::where("user","=", $id )->get();
+        
+        return \Response::json(["ind"=>$individuel , "experience"=>$experience , "skill" =>$skill , "education"=>$education ]);
+    }
+
+    /**
+     * Update the specified resource in storage.
+     */
+    public function update(Request $request, string $id)
+    {
+        $data = $request->input();
+        $id = \Auth::id() ;
+         Individuel::where("user_id", "=" ,$id)->update($data);
+        return \Response::json(["status"=>200]);
+    }
+
+    /**
+     * Remove the specified resource from storage.
+     */
+    public function destroy(string $id)
+    {
+        //
+    }
+}
