@@ -31,7 +31,7 @@ Route::resources([
     "demandes" => DemandesController::class,
     "education" => EducationController::class,
     "experience"=>ExperienceController::class ,
-    "entreprise" => DemandesController::class,
+    "entreprise" => EntrepriseController::class,
     "individuel" => IndividuelController::class,
     "skill" => SkillController::class,
     "offres" => OffreController::class,

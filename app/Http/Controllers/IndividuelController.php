@@ -55,11 +55,12 @@ class IndividuelController extends Controller
      */
     public function show(string $id)
     {
-        $individuel = Individuel::where("user_id","=", $id )->get();
-        $experience = Experience::where("user_id","=", $id )->get();
-        $skill = Skills::where("user_id","=", $id )->get();
-        $education = Education::where("user","=", $id )->get();
-        $email = User::find($id)->email ;
+        $individuel = Individuel::find( $id );
+        $experience = Experience::where("user_id","=", $individuel->user_id )->get();
+        $skill = Skills::where("user_id","=",$individuel->user_id )->get();
+        $education = Education::where("user","=", $individuel->user_id  )->get();
+        $email = User::find($individuel->user_id )->email ;
+
         return \Response::json(["ind"=>$individuel , "experience"=>$experience , "skill" =>$skill , "education"=>$education ,"email"=> $email]);
     }
 

@@ -56,7 +56,7 @@ class LoginSignupController extends Controller
         }
         ;
     }
-    public function islogged(){
-        return Response::json(["loggedIn"=>Auth::check() , "id"=>Auth::id()]);
+    public function islogged(Request $request){
+        return Response::json(["loggedIn"=>Auth::check() , "id"=>Auth::id() , "type"=>$request->user()->type]);
     }
 }

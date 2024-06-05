@@ -48,7 +48,10 @@ class EntrepriseController extends Controller
      */
     public function show(string $id)
     {
-        $entreprise = Entreprise::find($id)->join("image", "entreprise.image = image.id")->join("city", "entreprise.city = city.id");
+    
+        $entreprise =
+        Entreprise::where("entreprise.id", "=" , "3")
+        ->get();
         return \Response::json($entreprise);
     }
 
