@@ -82,11 +82,11 @@ class IndividuelController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        return $request;
         $request->validate([
             "phone"=>"numeric",
-            "image"=>"image",
         ]);
+        $data = $request->input();
+        return \Response::json(["data"=>$request->input("description")]);
         if($id != \Auth::id()){
         return \Response::json(["status"=>403 , "message"=>"user unautorized"]);
         }
@@ -95,7 +95,6 @@ class IndividuelController extends Controller
             $image = Image::create(["path"=>$image]);
             return $image ;
         }
-            $data = $request->input();
             $id = \Auth::id() ;
             Individuel::where("user_id", "=" ,$id)->update($data);
 
