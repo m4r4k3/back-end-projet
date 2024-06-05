@@ -19,13 +19,16 @@ class DemandesController extends Controller
             "individuel.nom as nom",
             "individuel.prenom as prenom",
             "domain.domain as domain",
-            "location",
             "demandes.created_at",
             "demandes.experience",
             "demandes.niveau",
             "demandes.description",
+            "city.name as location",
             "role"
-        )->orderBy("created_at")->join("individuel", "individuel.user_id", "=", "demandes.user_id")->join("domain", "individuel.domain", "=", "domain.id");
+        )->orderBy("created_at")
+        ->join("individuel", "individuel.user_id", "=", "demandes.user_id")
+        ->join("city", "city.id", "=", "demandes.location")
+        ->join("domain", "individuel.domain", "=", "domain.id");
         if ($request->has("q")) {
             $q = "%" . $request->input("q") . "%";
             $demandes = $demandes->where(function ($query) use ($q) {

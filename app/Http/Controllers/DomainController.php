@@ -2,29 +2,16 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Entreprise;
 use Illuminate\Http\Request;
-
-class EntrepriseController extends Controller
+use App\Models\Domain ;
+class DomainController extends Controller
 {
     /**
      * Display a listing of the resource.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $entreprise = Entreprise::orderBy("created_at");
-        if($request->has("q")){
-            $q="%".$request->input("q")."%";
-            $entreprise = Entreprise::where(function ($query) use ($q) {
-                $query->where("name", "like", $q)->orWhere("description", "like", $q);
-            });
-    
-        };
-        if($request->has("city")){
-            $city = $request->input("city");
-            $entreprise = $entreprise->where("city", "=",$city);
-        };
-        return \Response::json($entreprise->limit(30)->get());
+        return \Response::json(Domain::all()); 
     }
 
     /**
@@ -48,9 +35,7 @@ class EntrepriseController extends Controller
      */
     public function show(string $id)
     {
-        
-        $entreprise = Entreprise::where("entreprise.id", "=" , $id)->get();
-        return \Response::json($entreprise);
+        //
     }
 
     /**

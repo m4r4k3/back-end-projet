@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\CityController;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\LoginSignupController;
@@ -12,6 +13,8 @@ use App\Http\Controllers\IndividuelController;
 use App\Http\Controllers\OffreController;
 use App\Http\Controllers\ApplicantController;
 use App\Http\Controllers\SearchController; 
+use App\Http\Controllers\ContratController; 
+use App\Http\Controllers\DomainController;
 /*
 |--------------------------------------------------------------------------
 | API Routes
@@ -34,6 +37,9 @@ Route::resources([
     "entreprise" => EntrepriseController::class,
     "individuel" => IndividuelController::class,
     "skill" => SkillController::class,
+    "city" => CityController::class,
+    "contrat" => ContratController::class,
+    "domain" => DomainController::class,
     "offres" => OffreController::class,
     "applicant" => ApplicantController::class
 ]);

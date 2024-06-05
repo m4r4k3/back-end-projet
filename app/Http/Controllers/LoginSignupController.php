@@ -7,7 +7,7 @@ use App\Models\Individuel;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Response;
-use Auth ;
+use Auth;
 
 class LoginSignupController extends Controller
 {
@@ -42,21 +42,30 @@ class LoginSignupController extends Controller
             ]);
         }
         $token = $user->createToken('remember_token')->plainTextToken;
-        return Response::json(["user" => $user, "token" => $token, "message" => "sign-up succesfully" , "status"=>200]);
+        return Response::json(["user" => $user, "token" => $token, "message" => "sign-up succesfully", "status" => 200]);
     }
-    public function login(Request $request){
-        $values = ["email"=>$request->post()["email"] ,"password"=>$request->post()["password"]  ];
-        if(Auth::attempt($values)){
-            $request->session()->regenerate() ; 
-            $user = User::find(Auth::id());
-            $token = $user->createToken('remember_token')->plainTextToken;
-            return Response::json(["user" => $user, "token" => $token, "message" => "sign-up succesfully" ,"status"=>200]);
-        }else{
-            return Response::json(["status"=>401 , "message"=>"sign-up failed"]);
+
+    public function login(Request $request)
+    {
+        $values = ["email" => $request->post()["email"], "password" => $request->post()["password"]];
+        if (Auth::attempt($values)) {
+            $request->session()->regenerate();
+            $type = User::find(Auth::id())->type;
+            $id = $type == 2 ? Entreprise::where("entreprise.user_id", "=", Auth::id())->get()[0]->id
+                : Individuel::where("individuel.user_id", "=", Auth::id())->get()[0]->id;
+            return Response::json(["id" => $id, "type" => $type]);
+        } else {
+            return Response::json(["status" => 401, "message" => "sign-up failed"]);
         }
         ;
     }
-    public function islogged(Request $request){
-        return Response::json(["loggedIn"=>Auth::check() , "id"=>Auth::id() , "type"=>$request->user()->type]);
+    public function islogged(Request $request)
+    {
+        if (!Auth::check()) {
+            return Response::json(["loggedIn" => false, "id" => null, "type" => null]);
+        }
+        $type = Auth::check() ? $request->user()->type : null;
+        $id = $type == 2 ? Entreprise::where("entreprise.user_id", "=", Auth::id())->get()[0]["id"] : Individuel::where("individuel.user_id", "=", Auth::id())->get()[0]["id"];
+        return Response::json(["loggedIn" => Auth::check(), "id" => $id, "type" => $type]);
     }
 }

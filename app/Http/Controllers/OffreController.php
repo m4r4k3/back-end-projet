@@ -18,7 +18,7 @@ class OffreController extends Controller
             "offres.salary",
             "entreprise.name",
             "domain.domain as domain",
-            "city",
+            "city.name as city",
             "offres.description",
             "offres.created_at",
             "offres.starting",
@@ -26,7 +26,9 @@ class OffreController extends Controller
             "offres.characteristic",
             "post"
         )
-        ->join("domain", "offres.domain_id", "=", "domain.id")->join("contrat", "offres.type_contrat", "=", "contrat.id");
+        ->join("domain", "offres.domain_id", "=", "domain.id")
+        ->join("city", "offres.city", "=", "city.id")
+        ->join("contrat", "offres.type_contrat", "=", "contrat.id");
         if ($request->has("q")) {
             $q = "%" . $request->input("q") . "%";
             $offres = $offres->where(function ($query) use ($q) {
