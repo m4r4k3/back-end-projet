@@ -28,7 +28,14 @@ class ApplicantController extends Controller
      */
     public function store(Request $request)
     {
-        //
+    if(\Auth::check()){
+        $data = $request->post() ;
+        $data["user_id"]=Individuel::where("user_id" , "=" , \Auth::id())->get[0]->id ;
+        Applicant::insert($data);
+       return ;
+    }else{
+        return \Response::json(["status"=>404]);
+    }
     }
 
     /**
