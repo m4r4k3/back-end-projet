@@ -64,7 +64,22 @@ class DemandesController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate(
+            [
+                "salary"=>"numeric",
+                "city"=>"integer", 
+                "experience"=>"integer", 
+            ]
+            );
+            try{
+                $data =  $request->post() ;
+                $data["user_id"]= \Auth::id();
+                if( Demandes::insert($data)){
+                    return \Response::json(["message"=>"offer added succesfuly"]) ; 
+                };
+            }catch (\Exception	$e) {
+                return \Response::json(["status"=>404 , "message"=>$e->getMessage()]) ; 
+            }
     }
 
     /**

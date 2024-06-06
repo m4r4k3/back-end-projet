@@ -70,7 +70,24 @@ class OffreController extends Controller
      */
     public function store(Request $request)
     {
-        //
+       $request->validate(
+            [
+                "starting"=>"date" ,
+                "salary"=>"numeric",
+                "city"=>"integer", 
+                "domain_id"=>"integer", 
+                "contrat"=>"integer", 
+            ]
+            );
+            try{
+                $data =  $request->post() ;
+                $data["user_id"]= \Auth::id();
+                if( Offres::create($data)){
+                    return \Response::json(["message"=>"offer added succesfuly"]) ; 
+                };
+            }catch (\Exception	$e) {
+                return \Response::json(["status"=>404 , "message"=>$e->getMessage()]) ; 
+            }
     }
 
     /**

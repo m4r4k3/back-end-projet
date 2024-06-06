@@ -66,7 +66,16 @@ class EntrepriseController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        //
+        if(\Auth::check()){
+
+            $request->validate([
+                "description"=>"string"
+            ]);
+        Entreprise::where("user_id" , "=" ,\Auth::id())->update(["description"=>$request->input("description")]);
+    return $request ; 
+    }else{
+        return \Response::json(["status"=>404]);
+    }
     }
 
     /**
