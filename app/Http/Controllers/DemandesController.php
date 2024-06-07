@@ -112,6 +112,10 @@ class DemandesController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $demande = Demandes::findOrFail($id) ;
+        if($demande->user_id == \Auth::id()) {
+           Demandes::find($id)->delete();
+           return \Response::json(["message"=>"success"]);
+        }
     }
 }

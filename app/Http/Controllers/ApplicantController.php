@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Applicant;
+use App\Models\Individuel;
 use Illuminate\Http\Request;
 
 class ApplicantController extends Controller
@@ -28,11 +29,12 @@ class ApplicantController extends Controller
      */
     public function store(Request $request)
     {
-    if(\Auth::check()){
         $data = $request->post() ;
-        $data["user_id"]=Individuel::where("user_id" , "=" , \Auth::id())->get[0]->id ;
-        Applicant::insert($data);
-       return ;
+        $data["user_id"]= \Auth::id();
+    if(\Auth::check() && !Applicant::where("user_id", "=" ,$data["user_id"])->where("offre_id", "=" ,$data["offre_id"])->exists()){
+
+        Applicant::insert([$data]);
+        return $data ;
     }else{
         return \Response::json(["status"=>404]);
     }
@@ -43,7 +45,7 @@ class ApplicantController extends Controller
      */
     public function show(string $id)
     {
-        $applicant = Applicant::where("offre_id")->join("postules", "postules.location = user.id")->join("image", "user.image = image.id");
+        $applicant = Applicant::where("offre_id" ,"=", $id)->get();
         return \Response::json($applicant);
     }
 

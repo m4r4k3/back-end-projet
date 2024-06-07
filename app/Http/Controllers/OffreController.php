@@ -119,6 +119,10 @@ class OffreController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $offre = Offres::findOrFail($id) ;
+        if($offre->user_id == \Auth::id()) {
+           Offres::find($id)->delete();
+           return \Response::json(["message"=>"success"]);
+        }
     }
 }

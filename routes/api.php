@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CityController;
+use App\Http\Controllers\CustomizedController;
 use App\Http\Controllers\EducationController;
 use App\Http\Controllers\ExperienceController;
 use App\Http\Controllers\LoginSignupController;
@@ -48,3 +49,5 @@ Route::get("/search", [SearchController::class , "teaser"]) ;
 Route::post("/signup", [LoginSignupController::class , "signup"]) ;
 Route::post("/login", [LoginSignupController::class , "login"]) ;
 Route::get("/islogged", [LoginSignupController::class , "islogged"]) ;
+Route::get("/mydemandes", [CustomizedController::class , "MyDemandes"]) ;
+Route::get("/myoffres", [CustomizedController::class , "MyOffres"]) ;

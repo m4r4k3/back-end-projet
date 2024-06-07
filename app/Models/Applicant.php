@@ -9,7 +9,7 @@ class Applicant extends Model
 {
     use HasFactory;
 
-    protected $table = 'postules';
+    protected $table = 'applicants';
 
     protected $fillable = [
         'offre_id',
