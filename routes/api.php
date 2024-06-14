@@ -49,5 +49,6 @@ Route::get("/search", [SearchController::class , "teaser"]) ;
 Route::post("/signup", [LoginSignupController::class , "signup"]) ;
 Route::post("/login", [LoginSignupController::class , "login"]) ;
 Route::get("/islogged", [LoginSignupController::class , "islogged"]) ;
+Route::post("/logout", [LoginSignupController::class , "logout"]) ;
 Route::get("/mydemandes", [CustomizedController::class , "MyDemandes"]) ;
 Route::get("/myoffres", [CustomizedController::class , "MyOffres"]) ;

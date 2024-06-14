@@ -16,6 +16,7 @@ class DemandesController extends Controller
         $demandes = Demandes::select(
             "demandes.id",
             "demandes.salaire",
+            "individuel.id as user_id",
             "individuel.nom as nom",
             "individuel.prenom as prenom",
             "domain.domain as domain",
@@ -26,24 +27,24 @@ class DemandesController extends Controller
             "city.name as location",
             "role"
         )->orderBy("created_at")
-        ->join("individuel", "individuel.user_id", "=", "demandes.user_id")
-        ->join("city", "city.id", "=", "demandes.location")
-        ->join("domain", "individuel.domain", "=", "domain.id");
-        if ($request->has("q")) {
+            ->join("individuel", "individuel.user_id", "=", "demandes.user_id")
+            ->leftJoin("city", "city.id", "=", "demandes.location")
+            ->leftJoin("domain", "individuel.domain", "=", "domain.id");
+        if ($request->input("q")) {
             $q = "%" . $request->input("q") . "%";
             $demandes = $demandes->where(function ($query) use ($q) {
-                $query->where("role", "like", $q)->orWhere("description", "like", $q);
+                $query->where("role", "like", $q)->orWhere("demandes.description", "like", $q);
             });
         }
         ;
-        if ($request->has("city")) {
+        if ($request->input("city")) {
             $city = $request->input("city");
-            $demandes = $demandes->where("city", "=", $city);
+            $demandes = $demandes->where("city.id", "=", $city);
         }
         ;
-        if ($request->has("salary")) {
+        if ($request->input("salary")) {
             $salary = $request->input("salary");
-            $demandes = $demandes->where("salary", ">", $salary);
+            $demandes = $demandes->where("salaire", ">", $salary);
         }
         ;
 
@@ -66,20 +67,22 @@ class DemandesController extends Controller
     {
         $request->validate(
             [
-                "salary"=>"numeric",
-                "city"=>"integer", 
-                "experience"=>"integer", 
+                "salary" => "numeric",
+                "city" => "integer",
+                "experience" => "integer",
             ]
-            );
-            try{
-                $data =  $request->post() ;
-                $data["user_id"]= \Auth::id();
-                if( Demandes::insert($data)){
-                    return \Response::json(["message"=>"offer added succesfuly"]) ; 
-                };
-            }catch (\Exception	$e) {
-                return \Response::json(["status"=>404 , "message"=>$e->getMessage()]) ; 
+        );
+        try {
+            $data = $request->post();
+            $data["user_id"] = \Auth::id();
+            $data["created_at"]= now();
+            if (Demandes::insert($data)) {
+                return \Response::json(["message" => "offer added succesfuly"]);
             }
+            ;
+        } catch (\Exception $e) {
+            return \Response::json([ "message" => $e->getMessage()] , 404);
+        }
     }
 
     /**
@@ -112,10 +115,10 @@ class DemandesController extends Controller
      */
     public function destroy(string $id)
     {
-        $demande = Demandes::findOrFail($id) ;
-        if($demande->user_id == \Auth::id()) {
-           Demandes::find($id)->delete();
-           return \Response::json(["message"=>"success"]);
+        $demande = Demandes::findOrFail($id);
+        if ($demande->user_id == \Auth::id()) {
+            Demandes::find($id)->delete();
+            return \Response::json(["message" => "success"]);
         }
     }
 }

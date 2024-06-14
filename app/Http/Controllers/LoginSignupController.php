@@ -13,51 +13,65 @@ class LoginSignupController extends Controller
 {
     public function signup(Request $request)
     {
-        $data = $request->validate(
-            [
-                "email" => "email|required",
-                "n-entreprise" => "nullable|string|min:5|max:15",
-                "name" => "nullable|string",
-                "last-name" => "nullable|string",
-                "first-name" => "nullable|string|min:5|max:15",
-                "password" => "min:8|max:15|required",
-                "type" => "required|numeric"
-            ]
-        );
-        $data["password"] = bcrypt($data["password"]);
-        $user = User::create($data);
         if ($request->post("type") == 2) {
+            $data = $request->validate(
+                [
+                    "email" => "email|required|unique:users,email",
+                    "n-entreprise" => "string|min:5|max:15|unique:entreprise,n-entreprise",
+                    "name" => "string|unique:entreprise",
+                    "password" => "min:8|max:15|required",
+                    "type" => "required|numeric"
+                ]
+            );
+            $data["password"] = bcrypt($data["password"]);
+            $user = User::create($data);
             //entr
-            Entreprise::create([
+            $entreprise = Entreprise::create([
                 "n-entreprise" => $data["n-entreprise"],
                 "user_id" => $user->id,
                 "name" => $data["name"]
             ]);
+            $token = $user->createToken('remember_token')->plainTextToken;
+            Auth::login($user);
+            return Response::json(["id" => $entreprise->id , "type"=>$user->type, "token" => $token, "message" => "sign-up succesfully", "status" => 200]);
         } else {
             //user
+            $data = $request->validate(
+                [
+                    "email" => "email|required|unique:users,email",
+                    "last-name" => "string",
+                    "first-name" => "string",
+                    "password" => "min:8|max:15|required",
+                    "type" => "required|numeric"
+                ]
+            );
+            $data["password"] = bcrypt($data["password"]);
+            $user = User::create($data);
             $Individuel = Individuel::create([
                 "prenom" => $data["last-name"],
                 "nom" => $data["first-name"],
                 "user_id" => $user->id
             ]);
+            $token = $user->createToken('remember_token')->plainTextToken;
+            Auth::login($user);
+            return Response::json(["id" => $Individuel->id , "type"=>$user->type, "token" => $token, "message" => "sign-up succesfully", "status" => 200]);
         }
-        $token = $user->createToken('remember_token')->plainTextToken;
-        return Response::json(["user" => $user, "token" => $token, "message" => "sign-up succesfully", "status" => 200]);
+
     }
 
     public function login(Request $request)
     {
-        $values = ["email" => $request->post()["email"], "password" => $request->post()["password"]];
+        $values = $request->post();
         if (Auth::attempt($values)) {
             $request->session()->regenerate();
             $type = User::find(Auth::id())->type;
             $id = $type == 2 ? Entreprise::where("entreprise.user_id", "=", Auth::id())->get()[0]->id
                 : Individuel::where("individuel.user_id", "=", Auth::id())->get()[0]->id;
             return Response::json(["id" => $id, "type" => $type]);
-        } else {
-            return Response::json(["status" => 401, "message" => "sign-up failed"]);
         }
-        ;
+        return Response::json([
+            "message" => "Unauthenticated."
+        ], 401);
     }
     public function islogged(Request $request)
     {
@@ -67,5 +81,10 @@ class LoginSignupController extends Controller
         $type = Auth::check() ? $request->user()->type : null;
         $id = $type == 2 ? Entreprise::where("entreprise.user_id", "=", Auth::id())->get()[0]["id"] : Individuel::where("individuel.user_id", "=", Auth::id())->get()[0]["id"];
         return Response::json(["loggedIn" => Auth::check(), "id" => $id, "type" => $type]);
+    }
+    public function logout()
+    {
+        \Session::flush();
+        Auth::logout();
     }
 }

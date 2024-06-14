@@ -11,7 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+        Schema::create("demandes", function (Blueprint $table){
+            $table->id();
+            $table->integer("salaire");
+            $table->string("role");
+            $table->timestamps();
+            $table->text("description");
+            $table->integer("experience");
+            $table->string("niveau");
+
+            $table->unsignedBigInteger("user_id");
+            $table->foreign("user_id")->references("id")->on("users")->onDelete('cascade');
+            });
     }
 
     /**
