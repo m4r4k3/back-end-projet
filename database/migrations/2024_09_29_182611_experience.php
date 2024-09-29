@@ -11,12 +11,15 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create("applicants", function (Blueprint $table){
+        Schema::create("experience", function (Blueprint $table){
             $table->id();
-            $table->unsignedBigInteger("offre_id");
+            $table->string("entr");
+            $table->string("post");
+            $table->string("start");
+            $table->string("end");
+            $table->text("description");
             $table->unsignedBigInteger("user_id");
-            $table->foreign("user_id")->references("user_id")->on("individuel")->onDelete('cascade');
-            $table->foreign("offre_id")->references("id")->on("offres")->onDelete('cascade');
+            $table->foreign("user_id")->references("id")->on("users")->onDelete('cascade');
             });
     }
 

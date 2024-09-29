@@ -26,14 +26,16 @@ class LoginSignupController extends Controller
             $data["password"] = bcrypt($data["password"]);
             $user = User::create($data);
             //entr
+            
             $entreprise = Entreprise::create([
                 "n-entreprise" => $data["n-entreprise"],
                 "user_id" => $user->id,
                 "name" => $data["name"]
             ]);
+
             $token = $user->createToken('remember_token')->plainTextToken;
             Auth::login($user);
-            return Response::json(["id" => $entreprise->id , "type"=>$user->type, "token" => $token, "message" => "sign-up succesfully", "status" => 200]);
+            return Response::json(["id" => $entreprise->id, "type" => $user->type, "token" => $token, "message" => "sign-up succesfully", "status" => 200]);
         } else {
             //user
             $data = $request->validate(
@@ -54,7 +56,7 @@ class LoginSignupController extends Controller
             ]);
             $token = $user->createToken('remember_token')->plainTextToken;
             Auth::login($user);
-            return Response::json(["id" => $Individuel->id , "type"=>$user->type, "token" => $token, "message" => "sign-up succesfully", "status" => 200]);
+            return Response::json(["id" => $Individuel->id, "type" => $user->type, "token" => $token, "message" => "sign-up succesfully", "status" => 200]);
         }
 
     }
@@ -79,6 +81,7 @@ class LoginSignupController extends Controller
             return Response::json(["loggedIn" => false, "id" => null, "type" => null]);
         }
         $type = Auth::check() ? $request->user()->type : null;
+
         $id = $type == 2 ? Entreprise::where("entreprise.user_id", "=", Auth::id())->get()[0]["id"] : Individuel::where("individuel.user_id", "=", Auth::id())->get()[0]["id"];
         return Response::json(["loggedIn" => Auth::check(), "id" => $id, "type" => $type]);
     }

@@ -10,7 +10,6 @@ class Applicant extends Model
     use HasFactory;
 
     protected $table = 'applicants';
-
     protected $fillable = [
         'offre_id',
         'user_id'

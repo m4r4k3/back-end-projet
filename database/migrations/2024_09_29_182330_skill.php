@@ -11,10 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create("contrat", function (Blueprint $table){
-        $table->id();
-        $table->string("type");
-        });
+       Schema::create("skill" , function(Blueprint $table) {
+        $table->id() ;
+        $table->string("title") ;
+        $table->unsignedBigInteger("user_id"); 
+
+        $table->foreign("user_id")->references("id")->on("users")->onDelete("cascade") ;
+       }) ; 
     }
 
     /**

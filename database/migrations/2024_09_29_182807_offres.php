@@ -13,17 +13,18 @@ return new class extends Migration
     {
            Schema::create("offres", function (Blueprint $table){
             $table->id();
-            $table->unsignedBigInteger("domain_id");
+            $table->unsignedBigInteger("domain");
             $table->unsignedBigInteger("city");
-            $table->integer("salary");
-            $table->text("characteristic");
-            $table->text("description");
             $table->unsignedBigInteger("user_id");
             $table->unsignedBigInteger("type_contrat");
+            $table->integer("salary");
+            $table->string("post") ;
+            $table->text("characteristic");
+            $table->text("description");
             $table->timestamps();
             $table->date("starting");
 
-            $table->foreign("user")->references("id")->on("users")->onDelete('cascade');
+            $table->foreign("user_id")->references("id")->on("users")->onDelete('cascade');
             $table->foreign("domain")->references("id")->on("domain")->onDelete('cascade');
             $table->foreign("city")->references("id")->on("city")->onDelete('cascade');
             });

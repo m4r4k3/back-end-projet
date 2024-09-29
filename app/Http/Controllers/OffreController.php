@@ -30,7 +30,7 @@ class OffreController extends Controller
             "post",
 
         )
-            ->join("domain", "offres.domain_id", "=", "domain.id")
+            ->join("domain", "offres.domain", "=", "domain.id")
             ->join("city", "offres.city", "=", "city.id")
             ->join("contrat", "offres.type_contrat", "=", "contrat.id");
         if (\Auth::check() && User::find(\Auth::id())->type == 1) {
@@ -87,7 +87,7 @@ class OffreController extends Controller
                 "starting" => "date",
                 "salary" => "numeric",
                 "city" => "integer",
-                "domain_id" => "integer",
+                "domain" => "integer",
                 "contrat" => "integer",
             ]
         );

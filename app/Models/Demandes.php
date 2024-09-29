@@ -15,6 +15,7 @@ class Demandes extends Model
         'salaire',
         'location',
         'role',
+        "domain",
         'id_user'
     ];
 }

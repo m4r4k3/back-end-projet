@@ -13,19 +13,19 @@ return new class extends Migration
     {
         Schema::create("individuel", function (Blueprint $table){
                 $table->id();
-                $table->string("time");
-                $table->unsignedBigInteger("domain");
-                $table->unsignedBigInteger("city");
+                $table->string("time")->nullable();
+                $table->unsignedBigInteger("domain")->nullable();
+                $table->unsignedBigInteger("city")->nullable();
                 $table->string("nom");
                 $table->string("prenom");
-                $table->text("description");
+                $table->text("description")->nullable();
                 $table->unsignedBigInteger("user_id");
                 $table->timestamps();
-                $table->string("entreprise");
-                $table->string("post");
-                $table->string("phone");
+                $table->string("entreprise")->nullable();
+                $table->string("post")->nullable();
+                $table->string("phone")->nullable();
 
-                $table->foreign("user")->references("id")->on("users")->onDelete('cascade');
+                $table->foreign("user_id")->references("id")->on("users")->onDelete('cascade');
                 $table->foreign("domain")->references("id")->on("domain")->onDelete('cascade');
                 $table->foreign("city")->references("id")->on("city")->onDelete('cascade');
                 });

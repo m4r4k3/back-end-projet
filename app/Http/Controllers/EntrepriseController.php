@@ -15,14 +15,16 @@ class EntrepriseController extends Controller
         $entreprise = Entreprise::orderBy("created_at");
         if($request->has("q")){
             $q="%".$request->input("q")."%";
-            $entreprise = Entreprise::where(function ($query) use ($q) {
-                $query->where("name", "like", $q)->orWhere("description", "like", $q);
-            });
+            $entreprise = Entreprise::select(
+                "*" , "city.name as city"
+            )->where(function ($query) use ($q) {
+                $query->where("entreprise.name", "like", $q)->orWhere("description", "like", $q);
+            })->leftJoin("city" , "entreprise.location" ,"=","city.id");
     
         };
-        if($request->has("city")){
-            $city = $request->input("city");
-            $entreprise = $entreprise->where("city", "=",$city);
+        if($request->has("location")){
+            $city = $request->input("location");
+            $entreprise = $entreprise->where("location", "=",$city);
         };
         return \Response::json($entreprise->limit(30)->get());
     }
@@ -68,10 +70,12 @@ class EntrepriseController extends Controller
     {
     if(\Auth::check()){
 
-            $request->validate([
-                "description"=>"string"
+        $data =       $request->validate([
+                "description"=>"string" ,
+                "location" =>"integer"
             ]);
-        Entreprise::where("user_id" , "=" ,\Auth::id())->update(["description"=>$request->input("description")]);
+    
+        Entreprise::where("user_id" , "=" ,\Auth::id())->update($data);
     return $request ; 
     }else{
         return \Response::json(["status"=>\Auth::check()]);

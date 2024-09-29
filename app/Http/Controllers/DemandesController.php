@@ -69,6 +69,7 @@ class DemandesController extends Controller
             [
                 "salary" => "numeric",
                 "city" => "integer",
+                "domain" => "integer",
                 "experience" => "integer",
             ]
         );

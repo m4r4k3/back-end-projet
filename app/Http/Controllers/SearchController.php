@@ -50,7 +50,7 @@ class SearchController extends Controller
             "offres.characteristic",
             "post"
         )
-        ->join("domain", "offres.domain_id", "=", "domain.id")
+        ->join("domain", "offres.domain", "=", "domain.id")
         ->join("city", "offres.city", "=", "city.id")
         ->join("contrat", "offres.type_contrat", "=", "contrat.id")->where(function ($query) use ($q) {
             $query->where("post", "like", $q)->orWhere("offres.description", "like", $q)->orWhere("characteristic", "like", $q);

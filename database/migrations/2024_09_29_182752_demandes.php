@@ -11,15 +11,19 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create("experience", function (Blueprint $table){
+        Schema::create("demandes", function (Blueprint $table){
             $table->id();
-            $table->string("entr");
-            $table->string("post");
-            $table->string("start");
-            $table->string("end");
+            $table->integer("salaire");
+            $table->string("role");
+            $table->timestamps();
             $table->text("description");
+            $table->integer("experience");
+            $table->string("niveau");
+
             $table->unsignedBigInteger("user_id");
-            $table->foreign("user")->references("id")->on("users")->onDelete('cascade');
+            $table->unsignedBigInteger("location");
+            $table->foreign("user_id")->references("id")->on("users")->onDelete('cascade');
+            $table->foreign("location")->references("id")->on("city")->onDelete('cascade');
             });
     }
 

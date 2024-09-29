@@ -14,7 +14,7 @@ class demadesSeeder extends Seeder
     public function run()
     {
         Offres::create([
-            'user_id' => 19,
+            'user_id' => 0,
             'city' => 'New York',
             'post' => 'Software Engineer',
             'salary' => 80000,
@@ -26,7 +26,7 @@ class demadesSeeder extends Seeder
         ]);
 
         Offres::create([
-            'user_id' => 23,
+            'user_id' => 0,
             'city' => 'San Francisco',
             'post' => 'Product Manager',
             'salary' => 90000,
@@ -38,7 +38,7 @@ class demadesSeeder extends Seeder
         ]);
 
         Offres::create([
-            'user_id' => 27,
+            'user_id' => 0,
             'city' => 'Chicago',
             'post' => 'Data Analyst',
             'salary' => 70000,

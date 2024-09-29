@@ -15,7 +15,7 @@ class DatabaseSeeder extends Seeder
         $this->call([
             TypeContratSeeder::class ,
             TypeDomainSeeder::class ,
-            TypeUserSeeder::class 
+            city::class 
         ]);
         // \App\Models\User::factory(10)->create();
 
