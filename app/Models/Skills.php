@@ -15,4 +15,7 @@ class Skills extends Model
         'title',
         'id_user'
     ];
+    public function  user(){
+        return $this->belongsTo(User::class) ;
+    }
 }

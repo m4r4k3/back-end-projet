@@ -14,4 +14,10 @@ class Applicant extends Model
         'offre_id',
         'user_id'
     ];
+    public function offre() {
+        return $this->hasOne(Offres::class);
+    }
+    public function user(){
+        return $this->hasOne(User::class) ; 
+    }
 }

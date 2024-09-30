@@ -18,4 +18,13 @@ class Demandes extends Model
         "domain",
         'id_user'
     ];
+     // belongs 
+
+     public function  user(){
+        return $this->belongsTo(User::class) ;
+    }
+    // has
+    public function city () {
+        return $this->hasOne(City::class) ;
+    }
 }

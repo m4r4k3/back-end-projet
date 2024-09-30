@@ -11,7 +11,14 @@ return new class extends Migration
      */
     public function up(): void
     {
-        //
+       Schema::create("applicants" ,function (Blueprint $table){
+        $table->id() ;
+        $table->unsignedBigInteger("offre_id") ;
+        $table->unsignedBigInteger("user_id") ;
+
+        $table->foreign("user_id")->references("id")->on("users")->onDelete("cascade") ;
+        $table->foreign("offre_id")->references("id")->on("offres")->onDelete("cascade") ;
+       }) ; 
     }
 
     /**

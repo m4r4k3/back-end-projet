@@ -14,4 +14,16 @@ class Domain extends Model
     protected $fillable = [
         'domain'
     ];
+    // belongs 
+
+    public function  offres(){
+        return $this->belongsToMany(Offres::class) ;
+    }
+    public function  entreprise(){
+        return $this->belongsTo(Entreprise::class) ;
+    }
+ public function  Individuel(){
+        return $this->belongsTo(Individuel::class) ;
+    }
+
 }

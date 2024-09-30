@@ -22,4 +22,15 @@ class Individuel extends Model
         "user_id",
         'description'
     ];
+    // has
+    public function domain(){
+        return $this->hasOne(Domain::class) ;
+    }
+    public function city(){
+        return $this->hasOne(City::class) ;
+    }
+    //belongs 
+    public function  user(){
+        return $this->belongsTo(User::class) ;
+    }
 }

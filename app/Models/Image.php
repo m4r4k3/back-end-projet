@@ -14,4 +14,7 @@ class Image extends Model
     protected $fillable = [
         'path'
     ];
+    public function  entreprise(){
+        return $this->belongsTo(User::class) ;
+    }
 }

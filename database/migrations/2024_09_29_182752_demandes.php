@@ -19,9 +19,9 @@ return new class extends Migration
             $table->text("description");
             $table->integer("experience");
             $table->string("niveau");
-
             $table->unsignedBigInteger("user_id");
             $table->unsignedBigInteger("location");
+            
             $table->foreign("user_id")->references("id")->on("users")->onDelete('cascade');
             $table->foreign("location")->references("id")->on("city")->onDelete('cascade');
             });
