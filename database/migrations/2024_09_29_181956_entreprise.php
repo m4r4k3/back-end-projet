@@ -22,7 +22,6 @@ return new class extends Migration
                 $table->unsignedBigInteger("user_id");
                 $table->string("n-entreprise") ;
                 $table->string("phone")->nullable();
-                $table->string("email");
 
                 $table->foreign("image")->references("id")->on("image")->onDelete('cascade');
                 $table->foreign("domain")->references("id")->on("domain")->onDelete('cascade');

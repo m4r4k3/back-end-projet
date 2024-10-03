@@ -14,11 +14,11 @@ class City extends Model
      // belongs 
 
      public function  offres(){
-        return $this->belongsToMany(Offres::class) ;
+        return $this->belongsTo(Offres::class) ;
     }
     
     public function  demandes(){
-        return $this->belongsToMany(Demandes::class) ;
+        return $this->belongsTo(Demandes::class) ;
     }
     public function  entreprise(){
         return $this->belongsTo(Entreprise::class) ;

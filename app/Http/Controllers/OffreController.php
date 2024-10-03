@@ -15,57 +15,45 @@ class OffreController extends Controller
      */
     public function index(Request $request)
     {
-
-        $offres = Offres::join("entreprise", "entreprise.user_id", "=", "offres.user_id")->select(
-            "offres.id as id",
-            "offres.salary",
-            "entreprise.name",
-            "domain.domain as domain",
-            "city.name as city",
-            "offres.description",
-            "offres.created_at",
-            "offres.starting",
-            "contrat.type as contrat",
-            "offres.characteristic",
-            "post",
-
-        )
-            ->join("domain", "offres.domain", "=", "domain.id")
-            ->join("city", "offres.city", "=", "city.id")
-            ->join("contrat", "offres.type_contrat", "=", "contrat.id");
-        if (\Auth::check() && User::find(\Auth::id())->type == 1) {
-            $offres->leftjoin('applicants', function ($join) {
-                $join->on('offres.id', '=', 'applicants.offre_id')
-                    ->where('applicants.user_id', '=', \Auth::id());
-            })->addSelect(DB::raw("if(applicants.user_id,true,false) as isApplied"))->groupBy("offres.id")
-            ;
-        }
-        if ($request->input("q")) {
-            $q = "%" . $request->input("q") . "%";
-            $offres = $offres->where(function ($query) use ($q) {
-                $query->where("post", "like", $q)->orWhere("offres.description", "like", $q)->orWhere("characteristic", "like", $q);
-                ;
-            });
-        }
-        ;
-        if ($request->input("city")) {
-            $city = $request->input("city");
-            $offres = $offres->where("offres.city", "=", $city);
-        }
-        ;
-        if ($request->input("salary")) {
-            $salary = $request->input("salary");
-            $offres = $offres->where("offres.salary", ">", 0);
-        }
+        $offres = Offres::with(["city", "contrat", "domain", "entreprise"])
+            ->when(
+                \Auth::check() && User::find(\Auth::id())->type == 1,
+                function ($query) use ($request) {
+                    $query->withCount(["applicants as isApplied" => function ($qeury){
+                        $qeury->where("applicants.user_id", "=", \Auth::id()) ;
+                    }]) ;
+                }
+            )->when($request->filled("q") , function ($query) use($request){
+                $q = "%" . $request->input("q") . "%";
+                $query->where(function ($sub) use ($q) {
+                    $sub->where("post", "like", $q)->orWhere("offres.description", "like", $q)->orWhere("characteristic", "like", $q);
+                    ;
+                });
+            })->when(
+                $request->filled("city"),
+                function ($query) use ($request) {
+                    $query->where("city", "=", $request->input("city"));
+                }
+            )->when(
+                $request->filled("salary"),
+                function ($query) use ($request) {
+                    $query->where("salaire", ">", $request->input("salary"));
+                })
+                ->when(
+                    $request->filled("contrat"),
+                    function ($query) use ($request) {
+                        $query->where("contrat", "=", $request->input("contrat"));
+                    })
+                    ->when(
+                        $request->filled("domain"),
+                        function ($query) use ($request) {
+                            $query->where("domain", "=", $request->input("domain"));
+                        })
+                        ->
+                    
+                    latest()->get()
         ;
 
-        if ($request->input("type_contrat")) {
-            $type_contrat = $request->input("type_contrat");
-            $offres = $offres->where("type_contrat", "=", $type_contrat);
-        }
-        ;
-
-        $offres = $offres->orderBy("created_at")->limit(30)->get();
         return \Response::json($offres);
     }
 
@@ -91,16 +79,13 @@ class OffreController extends Controller
                 "contrat" => "integer",
             ]
         );
-        try {
-            $data = $request->post();
-            $data["user_id"] = \Auth::id();
-            if (Offres::create($data)) {
-                return \Response::json(["message" => "offer added succesfuly"]);
-            }
-            ;
-        } catch (\Exception $e) {
-            return \Response::json(["status" => 404, "message" => $e->getMessage()]);
+        $data = $request->post();
+        $data["user_id"] = \Auth::id();
+        if (Offres::create($data)) {
+            return \Response::json(["message" => "offer added succesfuly"]);
         }
+        ;
+
     }
 
     /**
@@ -134,7 +119,7 @@ class OffreController extends Controller
     {
         $offre = Offres::findOrFail($id);
         if ($offre->user_id == \Auth::id()) {
-            Offres::find($id)->delete();
+            $offre->delete();
             return \Response::json(["message" => "success"]);
         }
     }

@@ -10,7 +10,6 @@ class Entreprise extends Model
     use HasFactory;
 
     protected $table = 'entreprise';
-
     protected $fillable = [
         'name',
         'description',
@@ -21,13 +20,13 @@ class Entreprise extends Model
     ];
     // has
     public function domain(){
-        return $this->hasOne(Domain::class) ;
+        return $this->hasOne(Domain::class,   "id" , "domain") ;
     }
     public function city(){
-        return $this->hasOne(City::class) ;
+        return $this->hasOne(City::class , "id" , "location") ;
     }
     //belongs 
     public function  user(){
-        return $this->belongsTo(User::class) ;
+        return $this->belongsTo(User::class ) ;
     }
 }

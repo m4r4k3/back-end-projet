@@ -30,7 +30,7 @@ class CustomizedController extends Controller
         )->join("entreprise", "entreprise.user_id", "=", "offres.user_id")
         ->join("domain", "offres.domain_id", "=", "domain.id")
         ->join("city", "offres.city", "=", "city.id")
-        ->join("contrat", "offres.type_contrat", "=", "contrat.id") ->get();
+        ->join("contrat", "offres.contrat", "=", "contrat.id") ->get();
 
         return Response::json( $data );
     }

@@ -37,9 +37,8 @@ class ApplicantController extends Controller
                 ->where("offre_id", "=", $data["offre_id"])
       ->exists();
 
-        if (\Auth::check() && !$isExists) {
+        if (!$isExists) {
             Applicant::insert([$data]);
-            return $data;
         } else {
             return \Response::json(["message" => "Unauthorized"], 403);
         }
@@ -51,13 +50,17 @@ class ApplicantController extends Controller
     public function show(string $id)
     {
         if (\Auth::check()) {
-            $applicant = Applicant::select("individuel.id", "individuel.prenom", "individuel.nom")
-                ->join("offres", "offres.id", "=", "applicants.offre_id")
-                ->join("individuel", "individuel.user_id", "=", "applicants.user_id")->
-                where(function ($query) use ($id) {
-                    $query->where("offre_id", "=", $id)->where("offres.user_id", "=", \Auth::id());
-                })->get();
-            return \Response::json($applicant);
+            // $applicant = Applicant::select("individuel.id", "individuel.prenom", "individuel.nom")
+            //     ->join("offres", "offres.id", "=", "applicants.offre_id")
+            //     ->join("individuel", "individuel.user_id", "=", "applicants.user_id")->
+            //     where(function ($query) use ($id) {
+            //         $query->where("offre_id", "=", $id)->where("offres.user_id", "=", \Auth::id());
+            //     })->get();
+            // return \Response::json($applicant);
+            $applicant = Applicant::with(["offres", "individuel"])->where(function ($query) use ($id) {
+                        $query->where("offre_id", "=", $id)
+                        ->where("offres.user_id", "=", \Auth::id());
+                    });
         }
         return \Response::json(["message" => "unauthorized"], 401);
     }

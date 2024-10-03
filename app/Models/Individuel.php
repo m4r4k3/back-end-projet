@@ -24,13 +24,22 @@ class Individuel extends Model
     ];
     // has
     public function domain(){
-        return $this->hasOne(Domain::class) ;
+        return $this->hasOne(Domain::class , "id" , "domain") ;
     }
     public function city(){
-        return $this->hasOne(City::class) ;
+        return $this->hasOne(City::class , "id" , "city") ;
+    }
+    public function experience(){
+        return $this->hasMany(Experience::class  , "user_id"  , "user_id" ) ;
+    }
+    public function skill(){
+        return $this->hasMany(Skills::class  , "user_id"  , "user_id" ) ;
+    }
+    public function education(){
+        return $this->hasMany(Education::class  , "user"  , "user_id" ) ;
     }
     //belongs 
     public function  user(){
-        return $this->belongsTo(User::class) ;
+        return $this->belongsTo(User::class ) ;
     }
 }

@@ -3,8 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\Demandes;
-use App\Models\TypeContrat;
+
 use Illuminate\Http\Request;
+use Response;
 
 class DemandesController extends Controller
 {
@@ -13,43 +14,37 @@ class DemandesController extends Controller
      */
     public function index(Request $request)
     {
-        $demandes = Demandes::select(
-            "demandes.id",
-            "demandes.salaire",
-            "individuel.id as user_id",
-            "individuel.nom as nom",
-            "individuel.prenom as prenom",
-            "domain.domain as domain",
-            "demandes.created_at",
-            "demandes.experience",
-            "demandes.niveau",
-            "demandes.description",
-            "city.name as location",
-            "role"
-        )->orderBy("created_at")
-            ->join("individuel", "individuel.user_id", "=", "demandes.user_id")
-            ->leftJoin("city", "city.id", "=", "demandes.location")
-            ->leftJoin("domain", "individuel.domain", "=", "domain.id");
-        if ($request->input("q")) {
-            $q = "%" . $request->input("q") . "%";
-            $demandes = $demandes->where(function ($query) use ($q) {
-                $query->where("role", "like", $q)->orWhere("demandes.description", "like", $q);
-            });
-        }
-        ;
-        if ($request->input("city")) {
-            $city = $request->input("city");
-            $demandes = $demandes->where("city.id", "=", $city);
-        }
-        ;
-        if ($request->input("salary")) {
-            $salary = $request->input("salary");
-            $demandes = $demandes->where("salaire", ">", $salary);
-        }
+
+        $demandes = Demandes::with(["city", "individuel", "domain"])
+            ->when(
+                $request->filled("q"),
+                function ($query) use ($request) {
+                    $q = "%" . $request->input("q") . "%";
+                    $query->where(function ($sub) use ($q) {
+                        $sub->where("role", "like", $q)->orWhere("demandes.description", "like", $q)
+                            ->orWhereHas(
+                                "individuel",
+                                function ($subsub) use ($q) {
+                                    $subsub->where("nom", "like", $q)->orWhere("prenom", "like", $q);
+                                }
+                            )
+                        ;
+                    });
+                }
+            )->when(
+                $request->filled("city"),
+                function ($query) use ($request) {
+                    $query->where("location", "=", $request->input("city"));
+                }
+            )->when(
+                $request->filled("salary"),
+                function ($query) use ($request) {
+                    $query->where("salaire", ">", $request->input("salary"));
+                }
+            )->get()
         ;
 
-        $demandes = $demandes->limit(30)->get();
-        return \Response::json($demandes);
+        return Response::json($demandes);
     }
 
     /**
@@ -62,7 +57,7 @@ class DemandesController extends Controller
 
     /**
      * Store a newly created resource in storage.
-     */
+     */ 
     public function store(Request $request)
     {
         $request->validate(
@@ -76,13 +71,13 @@ class DemandesController extends Controller
         try {
             $data = $request->post();
             $data["user_id"] = \Auth::id();
-            $data["created_at"]= now();
+            $data["created_at"] = now();
             if (Demandes::insert($data)) {
                 return \Response::json(["message" => "offer added succesfuly"]);
             }
             ;
         } catch (\Exception $e) {
-            return \Response::json([ "message" => $e->getMessage()] , 404);
+            return \Response::json(["message" => $e->getMessage()], 404);
         }
     }
 
@@ -118,7 +113,7 @@ class DemandesController extends Controller
     {
         $demande = Demandes::findOrFail($id);
         if ($demande->user_id == \Auth::id()) {
-            Demandes::find($id)->delete();
+            $demande->delete();
             return \Response::json(["message" => "success"]);
         }
     }

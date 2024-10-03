@@ -12,33 +12,35 @@ class Offres extends Model
     protected $table = 'offres';
 
     protected $fillable = [
-        'domain_id',
+        'domain',
         'post',
         'city',
         'user_id',
         'salary',
         'description',
         'characteristic',
-        'type_contrat',
+        'contrat',
         'starting'
     ];
     // has
     public function  applicants(){
-        return $this->hasMany(Applicant::class) ;
+        return $this->hasMany(Applicant::class , "offre_id" , "id")  ;
     }
-    
-    public function  city(){
-        return $this->hasOne(City::class) ;
+    public function domain () {
+        return $this->hasOne(Domain::class , "id" , "domain") ;
+    }
+    public function city(){
+        return $this->hasOne(City::class , "id" , "city") ;
     }
     public function  contrat(){
-        return $this->hasOne(Contrat::class) ;
-    }
-    public function  domain(){
-        return $this->hasOne(Domain::class) ;
+        return $this->hasOne(Contrat::class , "id" , "contrat") ;
     }
     // belongs to
     public function user () {
         return $this->belongsTo(User::class) ;
+    }
+    public function entreprise () {
+        return $this->belongsTo(Entreprise::class , "user_id" ,"user_id") ;
     }
 
 }

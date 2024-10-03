@@ -9,6 +9,7 @@ use App\Models\Skills;
 use App\Models\User;
 use App\Models\Image;
 use Illuminate\Http\Request;
+use Response;
 
 class IndividuelController extends Controller
 {
@@ -19,7 +20,7 @@ class IndividuelController extends Controller
     {
 
 
-        $individuel = Individuel::orderBy("created_at");
+        $individuel = Individuel::orderBy("created_at")->with(["city"]);
         if ($request->has("q")) {
             $q = "%" . $request->input("q") . "%";
             $individuel = $individuel->where(function ($query) use ($q) {
@@ -57,13 +58,8 @@ class IndividuelController extends Controller
      */
     public function show(string $id)
     {
-        $individuel = Individuel::select("*","city.name as city")->where("individuel.id","=",$id)->leftJoin("city" , "individuel.city" ,"=","city.id")->get()[0];
-        $experience = Experience::where("user_id", "=", $individuel->user_id)->get();
-        $skill = Skills::where("user_id", "=", $individuel->user_id)->get();
-        $education = Education::where("user", "=", $individuel->user_id)->get();
-        $email = User::find($individuel->user_id)->email;
-
-        return \Response::json(["ind" => $individuel, "experience" => $experience, "skill" => $skill, "education" => $education, "email" => $email]);
+        $individuel = Individuel::with(["city" , "experience" ,"skill" , "education" ])->findOrFail($id);
+        return Response::json($individuel) ;
     }
 
     /**
@@ -71,13 +67,8 @@ class IndividuelController extends Controller
      */
     public function edit(Request $request)
     {
-        $id = \Auth::id();
-        $individuel = Individuel::where("user_id", "=", $id)->get();
-        $experience = Experience::where("user_id", "=", $id)->get();
-        $skill = Skills::where("user_id", "=", $id)->get();
-        $education = Education::where("user", "=", $id)->get();
-
-        return \Response::json(["ind" => $individuel, "experience" => $experience, "skill" => $skill, "education" => $education]);
+        $individuel = Individuel::with(["experience" ,"skill" , "education" ])->findOrFail(\Auth::id());
+        return Response::json($individuel) ;
     }
 
     /**
@@ -85,16 +76,15 @@ class IndividuelController extends Controller
      */
     public function update(Request $request, string $id)
     {
-        $request->validate([
+        $request->validate(rules: [
             "phone" => "numeric",
         ]);
         $data = $request->input();
-        if ($id != \Auth::id()) {
-
-            $id = \Auth::id();
-            Individuel::where("user_id", "=", $id)->update($data);
-
+        if (\Auth::check()) {
+                Individuel::where("user_id", "=",  \Auth::id())->update($data);
             return \Response::json(["status" => 200]);
+        } else {
+            return \Response::json(["status" => \Auth::check()]);
         }
     }
 

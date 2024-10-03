@@ -23,8 +23,15 @@ class Demandes extends Model
      public function  user(){
         return $this->belongsTo(User::class) ;
     }
+    
+    public function individuel(){
+        return $this->belongsTo(Individuel::class , "user_id" ,"user_id") ;
+    }
     // has
-    public function city () {
-        return $this->hasOne(City::class) ;
+    public function domain () {
+        return $this->hasOne(Domain::class , "id" , "domain") ;
+    }
+    public function city(){
+        return $this->hasOne(City::class , "id" , "location") ;
     }
 }

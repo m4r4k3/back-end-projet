@@ -16,9 +16,10 @@ class Domain extends Model
     ];
     // belongs 
 
-    public function  offres(){
-        return $this->belongsToMany(Offres::class) ;
+    public function  offre(){
+        return $this->belongsTo(Offres::class) ;
     }
+ 
     public function  entreprise(){
         return $this->belongsTo(Entreprise::class) ;
     }

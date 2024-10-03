@@ -13,9 +13,9 @@ class Skills extends Model
 
     protected $fillable = [
         'title',
-        'id_user'
+        'user_id'
     ];
     public function  user(){
-        return $this->belongsTo(User::class) ;
+        return $this->belongsTo(Individuel::class) ;
     }
 }

@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Entreprise;
 use Illuminate\Http\Request;
+use Response;
 
 class EntrepriseController extends Controller
 {
@@ -12,21 +13,20 @@ class EntrepriseController extends Controller
      */
     public function index(Request $request)
     {
-        $entreprise = Entreprise::orderBy("created_at");
-        if($request->has("q")){
-            $q="%".$request->input("q")."%";
-            $entreprise = Entreprise::select(
-                "*" , "city.name as city"
-            )->where(function ($query) use ($q) {
-                $query->where("entreprise.name", "like", $q)->orWhere("description", "like", $q);
-            })->leftJoin("city" , "entreprise.location" ,"=","city.id");
-    
-        };
-        if($request->has("location")){
+        
+        $entreprise = Entreprise::when($request->filled("q"), function ($query) use ($request) {
+            $q = "%" . $request->input("q") . "%";
+            $query->where(function ($sub) use ($q) {
+                $sub->where("entreprise.name", "like", $q)->orWhere("description", "like", $q);
+            });
+        })->when($request->filled("location"), function ($query) use ($request) {
             $city = $request->input("location");
-            $entreprise = $entreprise->where("location", "=",$city);
-        };
-        return \Response::json($entreprise->limit(30)->get());
+            $query->where("location", "=", $city);
+        })->latest()->with(["city" => function ($query) {
+            $query->select("id", "name as city") ;
+        }]);
+
+        return \Response::json($entreprise->get());
     }
 
     /**
@@ -49,9 +49,8 @@ class EntrepriseController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
-    {
-        
-        $entreprise = Entreprise::where("entreprise.id", "=" , $id)->get();
+    {   
+        $entreprise = Entreprise::with(["city" , "domain"])->findOrFail($id);
         return \Response::json($entreprise);
     }
 
@@ -68,18 +67,17 @@ class EntrepriseController extends Controller
      */
     public function update(Request $request, string $id)
     {
-    if(\Auth::check()){
+        if (\Auth::check()) {
 
-        $data =       $request->validate([
-                "description"=>"string" ,
-                "location" =>"integer"
+            $data = $request->validate([
+                "description" => "string",
+                "location" => "integer"
             ]);
-    
-        Entreprise::where("user_id" , "=" ,\Auth::id())->update($data);
-    return $request ; 
-    }else{
-        return \Response::json(["status"=>\Auth::check()]);
-    }
+
+            Entreprise::where("user_id", "=", \Auth::id())->update($data);
+        } else {
+            return \Response::json(["status" =>401]);
+        }
     }
 
     /**
