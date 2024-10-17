@@ -15,7 +15,7 @@ class Applicant extends Model
         'user_id'
     ];
     public function offre() {
-        return $this->belongsTo(Offres::class);
+            return $this->belongsTo(Offres::class);
     }
     public function user(){
         return $this->hasOne(User::class) ; 

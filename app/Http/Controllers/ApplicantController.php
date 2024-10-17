@@ -48,19 +48,16 @@ class ApplicantController extends Controller
      * Display the specified resource.
      */
     public function show(string $id)
+
     {
+        $id = \Auth::id() ;
+
         if (\Auth::check()) {
-            // $applicant = Applicant::select("individuel.id", "individuel.prenom", "individuel.nom")
-            //     ->join("offres", "offres.id", "=", "applicants.offre_id")
-            //     ->join("individuel", "individuel.user_id", "=", "applicants.user_id")->
-            //     where(function ($query) use ($id) {
-            //         $query->where("offre_id", "=", $id)->where("offres.user_id", "=", \Auth::id());
-            //     })->get();
-            // return \Response::json($applicant);
-            $applicant = Applicant::with(["offres", "individuel"])->where(function ($query) use ($id) {
-                        $query->where("offre_id", "=", $id)
-                        ->where("offres.user_id", "=", \Auth::id());
-                    });
+            $applicant = Applicant::where("offre_id", "=", $id)
+                    ->with(["offres"=>function ($query) use($id) {
+                        $query->where("user_id" , "=" ,$id) ;
+                    }, "individuel"]);
+            return $applicant->get() ;  
         }
         return \Response::json(["message" => "unauthorized"], 401);
     }

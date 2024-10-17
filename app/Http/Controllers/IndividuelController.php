@@ -19,21 +19,20 @@ class IndividuelController extends Controller
     public function index(Request $request)
     {
 
-
-        $individuel = Individuel::orderBy("created_at")->with(["city"]);
-        if ($request->has("q")) {
+        $individuel = Individuel::with(["city"])->when(
+            $request->filled("q") , 
+            function ($query) use ($request) {
             $q = "%" . $request->input("q") . "%";
-            $individuel = $individuel->where(function ($query) use ($q) {
+            $query->where(function ($query) use ($q) {
                 $query->where("nom", "like", $q)->orWhere("description", "like", $q)->orWhere("prenom", "like", $q);
             });
-        }
-        ;
-        if ($request->has("city")) {
+            }
+        )->when ( $request->has("city") , function ($query) use ($request) {
             $city = $request->input("city");
-            $individuel = $individuel->where("location", "=", $city);
-        }
-        ;
-        return \Response::json($individuel->limit(30)->get());
+            $query->where("location", "=", $city);
+        } )->orderBy("created_at");
+
+        return \Response::json($individuel->get());
     }
 
 
@@ -82,10 +81,10 @@ class IndividuelController extends Controller
         $data = $request->input();
         if (\Auth::check()) {
                 Individuel::where("user_id", "=",  \Auth::id())->update($data);
-            return \Response::json(["status" => 200]);
-        } else {
-            return \Response::json(["status" => \Auth::check()]);
-        }
+                return \Response::json(["status" => 200]);
+        } 
+        return \Response::json(["status" =>401]);
+        
     }
 
     /**
