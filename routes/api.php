@@ -44,7 +44,6 @@ Route::resources([
     "offres" => OffreController::class,
     "applicant" => ApplicantController::class
 ]);
-
 Route::get("/search", [SearchController::class , "teaser"]) ;
 Route::post("/signup", [LoginSignupController::class , "signup"]) ;
 Route::post("/login", [LoginSignupController::class , "login"]) ;
